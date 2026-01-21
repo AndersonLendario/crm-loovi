@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu CRM de Vendas</title>
     <style>
-        /* Estilização Geral */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7f6;
@@ -18,16 +17,14 @@
             color: #333;
         }
 
-        /* Container Principal do Kanban */
         .kanban-container {
             display: flex;
             gap: 15px;
-            overflow-x: auto; /* Permite rolagem horizontal em telas menores */
+            overflow-x: auto;
             padding-bottom: 20px;
             align-items: flex-start;
         }
 
-        /* Estilização das Colunas */
         .kanban-column {
             background-color: #ebedf0;
             border-radius: 8px;
@@ -35,7 +32,7 @@
             flex: 1;
             padding: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            min-height: 80vh;
+            min-height: 80vh; /* Importante para conseguir soltar cards em colunas vazias */
         }
 
         .kanban-column h2 {
@@ -46,7 +43,6 @@
             border-bottom: 2px solid #ddd;
         }
 
-        /* Cores específicas para cada coluna para facilitar visualização */
         #coluna-novos-leads { border-top: 5px solid #3498db; }
         #coluna-qualificacao { border-top: 5px solid #9b59b6; }
         #coluna-proposta-enviada { border-top: 5px solid #f1c40f; }
@@ -54,27 +50,32 @@
         #coluna-ganhos { border-top: 5px solid #2ecc71; }
         #coluna-perdidos { border-top: 5px solid #e74c3c; }
 
-        /* Estilização dos Cards (Leads) */
         .kanban-card {
             background-color: #fff;
             border-radius: 4px;
             padding: 15px;
             margin-top: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-            cursor: pointer;
+            cursor: grab; /* Muda o cursor para indicar que é arrastável */
             transition: transform 0.2s;
             border-left: 3px solid #ccc;
         }
 
-        .kanban-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+
+        /* Estilo para o card enquanto ele está sendo arrastado */
+        .sortable-ghost {
+            opacity: 0.4;
+            background-color: #d1d1d1;
         }
 
         .kanban-card p {
             margin: 0;
             font-weight: bold;
             color: #333;
+            pointer-events: none; /* Evita interferência no drag and drop */
         }
     </style>
 </head>
@@ -83,7 +84,6 @@
     <h1>Meu CRM de Vendas</h1>
 
     <div class="kanban-container">
-        <!-- Colunas do Funil -->
         <div id="coluna-novos-leads" class="kanban-column">
             <h2>Novos Leads</h2>
         </div>
@@ -109,6 +109,9 @@
         </div>
     </div>
 
+    <!-- Importação da biblioteca SortableJS via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <!-- Nosso script personalizado -->
     <script src="script.js"></script>
 </body>
 </html>
