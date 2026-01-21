@@ -23,7 +23,7 @@ function fetchLeads() {
         .then(data => {
             console.log("Leads recebidos:", data);
             populateKanban(data);
-            initKanban(); // Inicia o drag-and-drop DEPOIS que os cards foram criados
+            initKanban();
         })
         .catch(error => {
             console.error('Falha ao buscar leads:', error);
