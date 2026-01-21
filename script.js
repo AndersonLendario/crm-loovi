@@ -27,7 +27,6 @@ function fetchLeads() {
         })
         .catch(error => {
             console.error('Falha ao buscar leads:', error);
-            // Opcional: Mostrar uma mensagem de erro na tela
             const kanbanContainer = document.querySelector('.kanban-container');
             if(kanbanContainer) {
                 kanbanContainer.innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar os dados. Verifique o console (F12) para mais detalhes.</p>';
@@ -38,9 +37,7 @@ function fetchLeads() {
 // Função para criar os cards e colocar nas colunas
 function populateKanban(leads) {
     console.log("Populando o Kanban com os leads...");
-    // Limpa as colunas antes de adicionar novos cards
     document.querySelectorAll('.kanban-column').forEach(column => {
-        // Limpa apenas os cards, não o título h2
         const cards = column.querySelectorAll('.kanban-card');
         cards.forEach(card => card.remove());
     });
@@ -49,9 +46,8 @@ function populateKanban(leads) {
         const card = document.createElement('div');
         card.className = 'kanban-card';
         card.textContent = lead.nome;
-        card.dataset.id = lead.id; // Adiciona o ID do lead ao card
+        card.dataset.id = lead.id;
 
-        // Converte o status_funil para um ID de coluna válido
         const columnId = coluna-${lead.status_funil.toLowerCase().replace(/ /g, '-')};
         const column = document.getElementById(columnId);
 
@@ -73,8 +69,8 @@ function initKanban() {
             animation: 150,
             onEnd: function (evt) {
                 const leadId = evt.item.dataset.id;
-                // Converte o ID da coluna de volta para o formato do Status
-                const novoStatus = evt.to.id.replace('coluna-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                const novoStatusRaw = evt.to.id.replace('coluna-', '');
+                const novoStatus = novoStatusRaw.charAt(0).toUpperCase() + novoStatusRaw.slice(1).replace(/-/g, ' ');
                 
                 console.log(Lead ${leadId} movido para ${novoStatus});
                 updateLeadStatus(leadId, novoStatus);
@@ -89,7 +85,7 @@ function updateLeadStatus(leadId, novoStatus) {
     fetch(apiUrl, {
         method: 'POST',
         headers: {
-            'Content-Type': 'text/plain;charset=utf-8', // Apps Script funciona melhor com text/plain para POST simples
+            'Content-Type': 'text/plain;charset=utf-8',
         },
         body: JSON.stringify({
             action: 'updateStatus',
