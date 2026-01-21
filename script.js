@@ -1,96 +1,111 @@
+// =================================================================
+// CONFIGURAÇÃO - COLOQUE A URL DA SUA API AQUI
+// =================================================================
+const apiUrl = 'https://script.google.com/macros/s/AKfycbxR-86oaqFwclsQUlOM-WZ_AScREHJfaZETw-UlGWdyG5Ni3rNLGjRhsB2XM0pq4QWqcg/exec';
+// =================================================================
+
+// Função principal que é chamada quando a página termina de carregar
 document.addEventListener('DOMContentLoaded', () => {
-
-    const URL_API = 'https://script.google.com/macros/s/AKfycbxR-86oaqFwclsQUlOM-WZ_AScREHJfaZETw-UlGWdyG5Ni3rNLGjRhsB2XM0pq4QWqcg/exec';
-
-    async function fetchLeads() {
-        try {
-            const response = await fetch(URL_API);
-            if (!response.ok) throw new Error('Erro ao buscar dados');
-            
-            const leads = await response.json();
-
-            leads.forEach(lead => {
-                criarCardLead(lead);
-            });
-
-            // Inicializa o Sortable após carregar os cards
-            initKanban();
-
-        } catch (error) {
-            console.error('Erro:', error);
-            // Dados de teste para visualizar o funcionamento sem a API:
-            // const teste = [{id: "1", nome: "Lead Teste", status_funil: "novos-leads"}];
-            // teste.forEach(criarCardLead);
-            // initKanban();
-        }
-    }
-
-    function criarCardLead(lead) {
-        const card = document.createElement('div');
-        card.classList.add('kanban-card');
-        
-        // 6. Adiciona o id do lead ao atributo data-id
-        card.setAttribute('data-id', lead.id);
-        
-        card.innerHTML = `<p>${lead.nome}</p>`;
-
-        const idColuna = `coluna-${lead.status_funil}`;
-        const colunaDestino = document.getElementById(idColuna);
-
-        if (colunaDestino) {
-            colunaDestino.appendChild(card);
-        }
-    }
-
-    // 1. Função para inicializar o Drag and Drop
-    function initKanban() {
-        // 2. Seleciona todas as colunas
-        const colunas = document.querySelectorAll('.kanban-column');
-
-        // 3. Itera sobre cada coluna
-        colunas.forEach(coluna => {
-            // 4. Inicializa o SortableJS
-            new Sortable(coluna, {
-                group: 'kanban', // Permite mover entre colunas com o mesmo nome de grupo
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                
-                // 5. Evento disparado ao soltar um card
-                onEnd: function (evt) {
-                    const leadId = evt.item.getAttribute('data-id'); // ID do card movido
-                    const novaColunaId = evt.to.id; // ID da coluna onde o card caiu
-                    
-                    // Extrai apenas o status do ID da coluna (ex: 'coluna-ganhos' vira 'ganhos')
-                    const novoStatus = novaColunaId.replace('coluna-', '');
-
-                    console.log(`Movendo lead ${leadId} para ${novoStatus}`);
-                    
-                    // Chama a função para atualizar no banco de dados/API
-                    updateLeadStatus(leadId, novoStatus);
-                }
-            });
-        });
-    }
-
-    // 5.c. Função para enviar a atualização para o servidor
-    async function updateLeadStatus(leadId, novoStatus) {
-        try {
-            const response = await fetch(URL_API, {
-                method: 'POST',
-                // Necessário para o Google Apps Script receber como JSON (ajuste conforme sua API)
-                body: JSON.stringify({
-                    action: "updateStatus",
-                    id: leadId,
-                    novoStatus: novoStatus
-                })
-            });
-
-            const result = await response.json();
-            console.log('Sucesso:', result);
-        } catch (error) {
-            console.error('Erro ao atualizar status:', error);
-        }
-    }
-
+    console.log("Página carregada. Iniciando CRM...");
     fetchLeads();
 });
+
+// Função para buscar os leads da nossa API (Google Sheets)
+function fetchLeads() {
+    console.log("Buscando leads na API...");
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na rede ou na API: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Leads recebidos:", data);
+            populateKanban(data);
+            initKanban(); // Inicia o drag-and-drop DEPOIS que os cards foram criados
+        })
+        .catch(error => {
+            console.error('Falha ao buscar leads:', error);
+            // Opcional: Mostrar uma mensagem de erro na tela
+            const kanbanContainer = document.querySelector('.kanban-container');
+            if(kanbanContainer) {
+                kanbanContainer.innerHTML = '<p style="color: red; text-align: center;">Erro ao carregar os dados. Verifique o console (F12) para mais detalhes.</p>';
+            }
+        });
+}
+
+// Função para criar os cards e colocar nas colunas
+function populateKanban(leads) {
+    console.log("Populando o Kanban com os leads...");
+    // Limpa as colunas antes de adicionar novos cards
+    document.querySelectorAll('.kanban-column').forEach(column => {
+        // Limpa apenas os cards, não o título h2
+        const cards = column.querySelectorAll('.kanban-card');
+        cards.forEach(card => card.remove());
+    });
+
+    leads.forEach(lead => {
+        const card = document.createElement('div');
+        card.className = 'kanban-card';
+        card.textContent = lead.nome;
+        card.dataset.id = lead.id; // Adiciona o ID do lead ao card
+
+        // Converte o status_funil para um ID de coluna válido
+        const columnId = coluna-${lead.status_funil.toLowerCase().replace(/ /g, '-')};
+        const column = document.getElementById(columnId);
+
+        if (column) {
+            column.appendChild(card);
+        } else {
+            console.warn(Coluna não encontrada para o status: ${lead.status_funil});
+        }
+    });
+}
+
+// Função para inicializar o "Arrastar e Soltar"
+function initKanban() {
+    console.log("Inicializando o SortableJS (drag-and-drop)...");
+    const columns = document.querySelectorAll('.kanban-column');
+    columns.forEach(column => {
+        new Sortable(column, {
+            group: 'kanban',
+            animation: 150,
+            onEnd: function (evt) {
+                const leadId = evt.item.dataset.id;
+                // Converte o ID da coluna de volta para o formato do Status
+                const novoStatus = evt.to.id.replace('coluna-', '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                console.log(Lead ${leadId} movido para ${novoStatus});
+                updateLeadStatus(leadId, novoStatus);
+            }
+        });
+    });
+}
+
+// Função para enviar a atualização de status para a API
+function updateLeadStatus(leadId, novoStatus) {
+    console.log(Enviando atualização para a API: ID ${leadId}, Novo Status ${novoStatus});
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8', // Apps Script funciona melhor com text/plain para POST simples
+        },
+        body: JSON.stringify({
+            action: 'updateStatus',
+            id: leadId,
+            novoStatus: novoStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            console.log("API confirmou a atualização!");
+        } else {
+            console.error("API retornou um erro:", data);
+        }
+    })
+    .catch(error => {
+        console.error('Falha ao atualizar status:', error);
+    });
+}
