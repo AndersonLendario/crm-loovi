@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu CRM de Vendas</title>
+    <style>
+        /* Estilização Geral */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Container Principal do Kanban */
+        .kanban-container {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto; /* Permite rolagem horizontal em telas menores */
+            padding-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        /* Estilização das Colunas */
+        .kanban-column {
+            background-color: #ebedf0;
+            border-radius: 8px;
+            min-width: 250px;
+            flex: 1;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 80vh;
+        }
+
+        .kanban-column h2 {
+            font-size: 1.1rem;
+            text-align: center;
+            color: #444;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        /* Cores específicas para cada coluna para facilitar visualização */
+        #coluna-novos-leads { border-top: 5px solid #3498db; }
+        #coluna-qualificacao { border-top: 5px solid #9b59b6; }
+        #coluna-proposta-enviada { border-top: 5px solid #f1c40f; }
+        #coluna-negociacao { border-top: 5px solid #e67e22; }
+        #coluna-ganhos { border-top: 5px solid #2ecc71; }
+        #coluna-perdidos { border-top: 5px solid #e74c3c; }
+
+        /* Estilização dos Cards (Leads) */
+        .kanban-card {
+            background-color: #fff;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-left: 3px solid #ccc;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        .kanban-card p {
+            margin: 0;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Meu CRM de Vendas</h1>
+
+    <div class="kanban-container">
+        <!-- Colunas do Funil -->
+        <div id="coluna-novos-leads" class="kanban-column">
+            <h2>Novos Leads</h2>
+        </div>
+
+        <div id="coluna-qualificacao" class="kanban-column">
+            <h2>Qualificação</h2>
+        </div>
+
+        <div id="coluna-proposta-enviada" class="kanban-column">
+            <h2>Proposta Enviada</h2>
+        </div>
+
+        <div id="coluna-negociacao" class="kanban-column">
+            <h2>Negociação</h2>
+        </div>
+
+        <div id="coluna-ganhos" class="kanban-column">
+            <h2>Ganhos</h2>
+        </div>
+
+        <div id="coluna-perdidos" class="kanban-column">
+            <h2>Perdidos</h2>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
